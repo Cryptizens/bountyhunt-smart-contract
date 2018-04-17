@@ -11,7 +11,9 @@ const BountyHunt = artifacts.require('./BountyHunt.sol')
 
 contract('BountyHunt', function ([owner, hunter]) {
   let correctSecret
-  let incorrectSecret
+  let incorrectSecret1
+  let incorrectSecret2
+  let badlyFormattedSecret
   let hashedSecret
 
   let reward
@@ -21,7 +23,9 @@ contract('BountyHunt', function ([owner, hunter]) {
 
   beforeEach('setup contract for each test', async function () {
       correctSecret = '99b3073692692fbbec7e5e98fc52bcc275c48107fd432f6908efffaf3c401cd6'
-      incorrectSecret = 'b07abba516bdad9b19ce62f0cf146034afb141a53d222742f2bb258f69727bc1'
+      incorrectSecret1 = 'b07abba516bdad9b19ce62f0cf146034afb141a53d222742f2bb258f69727bc1'
+      incorrectSecret2 = 'c07abba516bdad9b19ce43f0cf146034afb141a53d222742f2bb258f69727bc1'
+      badlyFormattedSecret = 'foobar'
       hashedSecret = '0xf721c3b8e04e484febdd0d43d5289d03980eb8eac2d7446f592b131fea6336b1'
 
       reward = 1e+18
@@ -44,7 +48,21 @@ contract('BountyHunt', function ([owner, hunter]) {
       assert.equal(web3.eth.getBalance(bountyHuntAddress).toNumber(), reward)
 
       try {
-          await bountyHunt.claimBounty(incorrectSecret, { from: hunter })
+          await bountyHunt.claimBounty(incorrectSecret1, { from: hunter })
+          assert.fail()
+      } catch (error) {
+          assert(error.toString().includes('revert'), error.toString())
+      }
+
+      try {
+          await bountyHunt.claimBounty(incorrectSecret2, { from: hunter })
+          assert.fail()
+      } catch (error) {
+          assert(error.toString().includes('revert'), error.toString())
+      }
+
+      try {
+          await bountyHunt.claimBounty(badlyFormattedSecret, { from: hunter })
           assert.fail()
       } catch (error) {
           assert(error.toString().includes('revert'), error.toString())

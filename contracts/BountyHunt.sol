@@ -16,7 +16,8 @@ contract BountyHunt {
 
   // The claim function, called by the person that will find the right
   // secret. A candidate secret will unlock the bounty only if its
-  // hash is equal to the hashed secret of the contract.
+  // hash is equal to the hashed secret of the contract. Note that the secret
+  // needs to be quoted when passed a param from the Remix interface.
   function claimBounty(string _secret) public {
     require(keccak256(_secret) == hashedSecret);
     msg.sender.transfer(address(this).balance);
